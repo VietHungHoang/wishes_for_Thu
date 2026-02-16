@@ -96,6 +96,7 @@
     }
 
     let introMode = true;
+    let stopLaunching = false;
     let last = 0;
 
     function animate(ts) {
@@ -105,12 +106,14 @@
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.globalAlpha = 1;
 
-        const interval = introMode ? 250 + Math.random() * 350 : 1500 + Math.random() * 2500;
-        if (ts - last > interval) {
-            fireworks.push(new Firework());
-            if (introMode && Math.random() > 0.2) fireworks.push(new Firework());
-            if (introMode && Math.random() > 0.5) fireworks.push(new Firework());
-            last = ts;
+        if (!stopLaunching) {
+            const interval = introMode ? 250 + Math.random() * 350 : 1500 + Math.random() * 2500;
+            if (ts - last > interval) {
+                fireworks.push(new Firework());
+                if (introMode && Math.random() > 0.2) fireworks.push(new Firework());
+                if (introMode && Math.random() > 0.5) fireworks.push(new Firework());
+                last = ts;
+            }
         }
 
         for (let i = fireworks.length - 1; i >= 0; i--) {
@@ -125,11 +128,12 @@
     requestAnimationFrame(animate);
 
     document.addEventListener('click', (e) => {
+        if (stopLaunching) return;
         if (e.target.closest('.music-toggle')) return;
         fireworks.push(new Firework(e.clientX, e.clientY));
     });
 
-    window.setFireworksAmbient = () => { introMode = false; };
+    window.setFireworksAmbient = () => { introMode = false; stopLaunching = true; };
 })();
 
 
