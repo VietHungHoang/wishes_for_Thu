@@ -1,0 +1,428 @@
+/* ============================================
+   NEW YEAR 2026 - FIREWORKS + SCROLLING LETTER
+   ============================================ */
+
+:root {
+    --clr-bg: #0a0a1a;
+    --clr-purple-light: #a78bfa;
+    --clr-pink: #ec4899;
+    --clr-pink-light: #f9a8d4;
+    --clr-gold: #fbbf24;
+    --clr-gold-light: #fde68a;
+    --clr-white: #fefefe;
+    --clr-white-soft: rgba(255, 255, 255, 0.85);
+    --clr-glass-border: rgba(255, 255, 255, 0.08);
+
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'Quicksand', 'Segoe UI', sans-serif;
+}
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: var(--font-body);
+    background: var(--clr-bg);
+    color: var(--clr-white);
+}
+
+/* === Canvas === */
+#fireworksCanvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* === Particles === */
+#particles-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+#particles-container .particle {
+    position: absolute;
+    border-radius: 50%;
+    animation: particleFloat linear infinite;
+    opacity: 0;
+}
+
+@keyframes particleFloat {
+    0% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 0.7;
+    }
+
+    90% {
+        opacity: 0.3;
+    }
+
+    100% {
+        transform: translateY(-10vh) scale(1);
+        opacity: 0;
+    }
+}
+
+/* === Hearts === */
+#hearts-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+    overflow: hidden;
+}
+
+#hearts-container .heart {
+    position: absolute;
+    top: -5%;
+    animation: heartFall linear infinite;
+    opacity: 0;
+}
+
+@keyframes heartFall {
+    0% {
+        transform: translateY(-10vh) rotate(0deg);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* ============================
+   FIREWORKS INTRO OVERLAY
+   ============================ */
+.intro-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 1.5s ease;
+}
+
+.intro-overlay.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.intro-overlay.hidden {
+    display: none;
+}
+
+.intro-title {
+    text-align: center;
+    opacity: 0;
+    transform: scale(0.6);
+    transition: opacity 1s ease, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.intro-title.show {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.intro-line {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: var(--clr-white);
+    line-height: 1.2;
+    text-shadow: 0 0 40px rgba(124, 58, 237, 0.4);
+}
+
+.intro-highlight {
+    background: linear-gradient(135deg, var(--clr-pink), var(--clr-purple-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-style: italic;
+}
+
+.intro-year {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 5.5rem;
+    font-weight: 700;
+    margin-top: 0.3rem;
+    background: linear-gradient(135deg, var(--clr-gold), #fff, var(--clr-gold-light), var(--clr-gold));
+    background-size: 300% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 2s linear infinite, glow 1s ease-in-out infinite alternate;
+    line-height: 1.1;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 0% center;
+    }
+
+    100% {
+        background-position: 300% center;
+    }
+}
+
+@keyframes glow {
+    0% {
+        filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.2));
+    }
+
+    100% {
+        filter: drop-shadow(0 0 50px rgba(251, 191, 36, 0.5));
+    }
+}
+
+/* ============================
+   LETTER CARD (scrolling)
+   ============================ */
+.lines-stage {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1s ease;
+    padding: 2rem;
+}
+
+.lines-stage.visible {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.letter-card {
+    width: 100%;
+    max-width: 580px;
+    height: 55vh;
+    overflow-y: auto;
+    background: linear-gradient(170deg,
+            rgba(30, 20, 50, 0.88) 0%,
+            rgba(25, 15, 45, 0.92) 50%,
+            rgba(20, 12, 40, 0.95) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 3px solid rgba(251, 191, 36, 0.4);
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    box-shadow:
+        0 16px 48px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    scroll-behavior: smooth;
+}
+
+/* Subtle scrollbar */
+.letter-card::-webkit-scrollbar {
+    width: 3px;
+}
+
+.letter-card::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.letter-card::-webkit-scrollbar-thumb {
+    background: rgba(251, 191, 36, 0.2);
+    border-radius: 3px;
+}
+
+/* Each line inside the letter */
+.line-item {
+    text-align: center;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    margin-bottom: 0.8rem;
+}
+
+.line-item:last-child {
+    margin-bottom: 0;
+}
+
+.line-item.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Divider line */
+.line-item.has-divider {
+    padding-top: 1rem;
+    margin-top: 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* === Line type styles === */
+.line-item.style-message {
+    font-size: 1.3rem;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--clr-white-soft);
+}
+
+.line-item.style-wish {
+    font-size: 1.25rem;
+    font-weight: 300;
+    line-height: 1.6;
+    color: var(--clr-white-soft);
+}
+
+.line-item.style-wish strong {
+    color: var(--clr-pink-light);
+    font-weight: 600;
+}
+
+.line-item.style-ending {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 700;
+    margin-top: 0.5rem;
+    background: linear-gradient(135deg, var(--clr-gold), var(--clr-pink-light), var(--clr-gold-light));
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 4s linear infinite;
+}
+
+.line-item.style-signature {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--clr-pink-light);
+    margin-bottom: 0.3rem;
+}
+
+.line-item.style-final {
+    font-size: 0.9rem;
+    color: var(--clr-gold);
+    font-weight: 600;
+    letter-spacing: 3px;
+    margin-bottom: 0;
+}
+
+/* === Music Toggle === */
+.music-toggle {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid var(--clr-glass-border);
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(10px);
+    font-size: 1.2rem;
+    cursor: pointer;
+    z-index: 100;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.music-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+}
+
+.music-toggle.playing {
+    border-color: var(--clr-pink);
+    animation: musicPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes musicPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 0 0 10px rgba(236, 72, 153, 0);
+    }
+}
+
+/* === Responsive === */
+@media (max-width: 768px) {
+    .intro-line {
+        font-size: 2.5rem;
+    }
+
+    .intro-year {
+        font-size: 4rem;
+    }
+
+    .letter-card {
+        padding: 2rem 1.5rem;
+    }
+
+    .line-item.style-ending {
+        font-size: 1.4rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .intro-line {
+        font-size: 2rem;
+    }
+
+    .intro-year {
+        font-size: 3rem;
+    }
+
+    .lines-stage {
+        padding: 1rem;
+    }
+
+    .letter-card {
+        padding: 1.5rem 1.2rem;
+        max-height: 80vh;
+    }
+
+    .line-item.style-message {
+        font-size: 1rem;
+    }
+
+    .line-item.style-wish {
+        font-size: 0.95rem;
+    }
+
+    .line-item.style-ending {
+        font-size: 1.3rem;
+    }
+}
+
+::selection {
+    background: rgba(236, 72, 153, 0.3);
+    color: var(--clr-white);
+}
