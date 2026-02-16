@@ -283,14 +283,14 @@ body {
 
 /* === Line type styles === */
 .line-item.style-message {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-weight: 300;
     line-height: 1.7;
     color: var(--clr-white-soft);
 }
 
 .line-item.style-wish {
-    font-size: 1.45rem;
+    font-size: 1.75rem;
     font-weight: 300;
     line-height: 1.6;
     color: var(--clr-white-soft);
@@ -410,11 +410,11 @@ body {
     }
 
     .line-item.style-message {
-        font-size: 1rem;
+        font-size: 1.2rem;
     }
 
     .line-item.style-wish {
-        font-size: 0.95rem;
+        font-size: 1.15rem;
     }
 
     .line-item.style-ending {
