@@ -224,7 +224,7 @@ body {
 .letter-card {
     width: 100%;
     max-width: 580px;
-    height: 55vh;
+    height: 70vh;
     overflow-y: auto;
     background: linear-gradient(170deg,
             rgba(30, 20, 50, 0.88) 0%,
@@ -283,14 +283,14 @@ body {
 
 /* === Line type styles === */
 .line-item.style-message {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
     font-weight: 300;
     line-height: 1.7;
     color: var(--clr-white-soft);
 }
 
 .line-item.style-wish {
-    font-size: 1.25rem;
+    font-size: 1.45rem;
     font-weight: 300;
     line-height: 1.6;
     color: var(--clr-white-soft);
@@ -303,7 +303,7 @@ body {
 
 .line-item.style-ending {
     font-family: var(--font-display);
-    font-size: 2rem;
+    font-size: 2.3rem;
     font-weight: 700;
     margin-top: 0.5rem;
     background: linear-gradient(135deg, var(--clr-gold), var(--clr-pink-light), var(--clr-gold-light));

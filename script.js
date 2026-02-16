@@ -169,89 +169,27 @@ function startHearts() {
 
 
 // ============================
-// MUSIC — Arpeggio
+// MUSIC — 1.mp3
 // ============================
-let audioCtx = null;
+let musicAudio = null;
 let musicPlaying = false;
-let musicNodes = { oscs: [], gains: [], master: null, intervals: [] };
 
 function startMusic() {
-    if (audioCtx) return;
-    try {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    } catch (e) { return; }
-
-    const master = audioCtx.createGain();
-    master.gain.setValueAtTime(0, audioCtx.currentTime);
-    master.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 2);
-    master.connect(audioCtx.destination);
-    musicNodes.master = master;
-
-    const padGain = audioCtx.createGain();
-    padGain.gain.value = 0.15;
-    padGain.connect(master);
-
-    [130.81, 164.81, 196.00, 246.94].forEach((freq, i) => {
-        const osc = audioCtx.createOscillator();
-        osc.type = i % 2 === 0 ? 'sine' : 'triangle';
-        osc.frequency.value = freq;
-        const g = audioCtx.createGain();
-        g.gain.value = 0.12;
-        osc.connect(g);
-        g.connect(padGain);
-        osc.start();
-
-        const lfo = audioCtx.createOscillator();
-        const lfoG = audioCtx.createGain();
-        lfo.frequency.value = 0.15 + i * 0.05;
-        lfoG.gain.value = 1.5;
-        lfo.connect(lfoG);
-        lfoG.connect(osc.frequency);
-        lfo.start();
-
-        musicNodes.oscs.push(osc, lfo);
-        musicNodes.gains.push(g);
-    });
-
-    const melodyNotes = [261.63, 329.63, 392.00, 493.88, 523.25, 493.88, 392.00, 329.63];
-    let noteIndex = 0;
-    const melodyOsc = audioCtx.createOscillator();
-    melodyOsc.type = 'sine';
-    melodyOsc.frequency.value = melodyNotes[0];
-    const melodyGain = audioCtx.createGain();
-    melodyGain.gain.value = 0.2;
-    melodyOsc.connect(melodyGain);
-    melodyGain.connect(master);
-    melodyOsc.start();
-    musicNodes.oscs.push(melodyOsc);
-    musicNodes.gains.push(melodyGain, padGain);
-
-    const arpInterval = setInterval(() => {
-        if (!audioCtx) { clearInterval(arpInterval); return; }
-        noteIndex = (noteIndex + 1) % melodyNotes.length;
-        melodyOsc.frequency.linearRampToValueAtTime(melodyNotes[noteIndex], audioCtx.currentTime + 0.15);
-        melodyGain.gain.setValueAtTime(0.22, audioCtx.currentTime);
-        melodyGain.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.5);
-    }, 600);
-
-    musicNodes.intervals.push(arpInterval);
+    if (musicAudio) return;
+    musicAudio = new Audio('1.mp3');
+    musicAudio.loop = true;
+    musicAudio.volume = 0.6;
+    musicAudio.play().catch(() => { });
     musicPlaying = true;
     document.getElementById('musicToggle').classList.add('playing');
     document.getElementById('musicToggle').textContent = '🎶';
 }
 
 function stopMusic() {
-    if (!audioCtx) return;
-    musicNodes.intervals.forEach(id => clearInterval(id));
-    if (musicNodes.master) {
-        musicNodes.master.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.8);
-    }
-    setTimeout(() => {
-        musicNodes.oscs.forEach(o => { try { o.stop(); } catch (e) { } });
-        try { audioCtx.close(); } catch (e) { }
-        audioCtx = null;
-        musicNodes = { oscs: [], gains: [], master: null, intervals: [] };
-    }, 1000);
+    if (!musicAudio) return;
+    musicAudio.pause();
+    musicAudio.currentTime = 0;
+    musicAudio = null;
     musicPlaying = false;
     document.getElementById('musicToggle').classList.remove('playing');
     document.getElementById('musicToggle').textContent = '🎵';
