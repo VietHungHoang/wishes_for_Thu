@@ -169,36 +169,29 @@ function startHearts() {
 
 
 // ============================
-// MUSIC — 1.mp3
+// MUSIC — Two tracks
 // ============================
-let musicAudio = null;
-let musicPlaying = false;
+let introAudio = null;
+let bgAudio = null;
 
-function startMusic() {
-    if (musicAudio) return;
-    musicAudio = new Audio('1.mp3');
-    musicAudio.loop = true;
-    musicAudio.volume = 0.6;
-    musicAudio.play().catch(() => { });
-    musicPlaying = true;
-    document.getElementById('musicToggle').classList.add('playing');
-    document.getElementById('musicToggle').textContent = '🎶';
+function startIntroMusic() {
+    introAudio = new Audio('1.mp3');
+    introAudio.loop = false;
+    introAudio.volume = 0.6;
+    introAudio.play().catch(() => { });
 }
 
-function stopMusic() {
-    if (!musicAudio) return;
-    musicAudio.pause();
-    musicAudio.currentTime = 0;
-    musicAudio = null;
-    musicPlaying = false;
-    document.getElementById('musicToggle').classList.remove('playing');
-    document.getElementById('musicToggle').textContent = '🎵';
+function switchToBgMusic() {
+    if (introAudio) {
+        introAudio.pause();
+        introAudio = null;
+    }
+    bgAudio = new Audio('2.mp3');
+    bgAudio.loop = true;
+    bgAudio.volume = 0.35;
+    bgAudio.currentTime = 31;
+    bgAudio.play().catch(() => { });
 }
-
-document.getElementById('musicToggle').addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (musicPlaying) stopMusic(); else startMusic();
-});
 
 
 // ============================
@@ -223,16 +216,17 @@ window.addEventListener('load', () => {
     const stage = document.getElementById('linesStage');
     const card = document.getElementById('letterCard');
 
-    // Start music
-    startMusic();
+    // Start intro music (1.mp3)
+    startIntroMusic();
 
     // Show title
     setTimeout(() => introTitle.classList.add('show'), 600);
 
-    // After 3s → show letter
+    // After 3s → switch to bg music + show letter
     setTimeout(() => {
         overlay.classList.add('fade-out');
         window.setFireworksAmbient();
+        switchToBgMusic();
 
         setTimeout(() => {
             overlay.classList.add('hidden');
